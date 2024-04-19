@@ -564,8 +564,9 @@ class RichTextState internal constructor(
     }
 
     fun addUnorderedList() {
-        val paragraph = getRichParagraphByTextIndex(selection.min - 1) ?: return
-        addUnorderedList(paragraph)
+        getRichParagraphListByTextRange(selection).forEach { paragraph ->
+            addUnorderedList(paragraph)
+        }
     }
 
     private fun addUnorderedList(paragraph: RichParagraph) {
@@ -580,8 +581,9 @@ class RichTextState internal constructor(
     }
 
     fun removeUnorderedList() {
-        val paragraph = getRichParagraphByTextIndex(selection.min - 1) ?: return
-        removeUnorderedList(paragraph)
+        getRichParagraphListByTextRange(selection).forEach { paragraph ->
+            removeUnorderedList(paragraph)
+        }
     }
 
     private fun removeUnorderedList(paragraph: RichParagraph) {
@@ -604,8 +606,9 @@ class RichTextState internal constructor(
     }
 
     fun addOrderedList() {
-        val paragraph = getRichParagraphByTextIndex(selection.min - 1) ?: return
-        addOrderedList(paragraph)
+        getRichParagraphListByTextRange(selection).forEach { paragraph ->
+            addOrderedList(paragraph)
+        }
     }
 
     private fun addOrderedList(paragraph: RichParagraph) {
@@ -641,8 +644,9 @@ class RichTextState internal constructor(
     }
 
     fun removeOrderedList() {
-        val paragraph = getRichParagraphByTextIndex(selection.min - 1) ?: return
-        removeOrderedList(paragraph)
+        getRichParagraphListByTextRange(selection).forEach { paragraph ->
+            removeOrderedList(paragraph)
+        }
     }
 
     private fun removeOrderedList(paragraph: RichParagraph) {
