@@ -1126,12 +1126,47 @@ class RichTextState internal constructor(
      * This method will use the [tempTextFieldValue] to get the new characters.
      */
     private fun handleAddingCharacters() {
-        val typedCharsCount = tempTextFieldValue.text.length - textFieldValue.text.length
+        var typedCharsCount = tempTextFieldValue.text.length - textFieldValue.text.length
+// нам иногда врёт selection, поэтому будем искать новое в строках сами
+
+        var spacesAdded = false
+        var addSpaces = ""
+        var deltaSelection = 0
         var startTypeIndex = tempTextFieldValue.selection.max - typedCharsCount
+        while (startTypeIndex > 0) {
+            val range = IntRange(0, startTypeIndex - 1)
+            if (textFieldValue.text.substring(range) != tempTextFieldValue.text.substring(range)) {
+                startTypeIndex -= 1
+                deltaSelection +=1
+//                addSpaces += " "
+//                typedCharsCount += 1
+//                spacesAdded = true
+            } else {
+                break
+            }
+        }
         val typedText = tempTextFieldValue.text.substring(
             startIndex = startTypeIndex,
             endIndex = startTypeIndex + typedCharsCount,
-        )
+        ) + addSpaces
+
+        if (spacesAdded) {
+            tempTextFieldValue = tempTextFieldValue.copy(
+                text = StringBuilder(tempTextFieldValue.text)
+                    .insert(tempTextFieldValue.selection.max, addSpaces)
+                    .toString()
+            )
+        }
+
+        if (deltaSelection != 0 && deltaSelection >= tempTextFieldValue.selection.min) {
+            tempTextFieldValue = tempTextFieldValue.copy(
+                selection = TextRange(
+                    tempTextFieldValue.selection.min - deltaSelection,
+                    tempTextFieldValue.selection.max - deltaSelection,
+                )
+            )
+        }
+
         val previousIndex = startTypeIndex - 1
 
         val activeRichSpan = getRichSpanByTextIndex(previousIndex)

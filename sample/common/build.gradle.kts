@@ -15,25 +15,25 @@ kotlin {
             }
         }
     }
-    jvm("desktop") {
-        jvmToolchain(11)
-    }
-    js(IR) {
-        browser()
-    }
-    @OptIn(ExperimentalWasmDsl::class)
-    wasmJs().browser()
+//    jvm("desktop") {
+//        jvmToolchain(11)
+//    }
+//    js(IR) {
+//        browser()
+//    }
+//    @OptIn(ExperimentalWasmDsl::class)
+//    wasmJs().browser()
 
-    listOf(
-        iosX64(),
-        iosArm64(),
-        iosSimulatorArm64()
-    ).forEach { iosTarget ->
-        iosTarget.binaries.framework {
-            baseName = "Common"
-            isStatic = true
-        }
-    }
+//    listOf(
+//        iosX64(),
+//        iosArm64(),
+//        iosSimulatorArm64()
+//    ).forEach { iosTarget ->
+//        iosTarget.binaries.framework {
+//            baseName = "Common"
+//            isStatic = true
+//        }
+//    }
 
     sourceSets {
         val commonMain by getting {

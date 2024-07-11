@@ -227,15 +227,14 @@ fun BasicRichTextEditor(
                 }
             }
         }
-    }
+}
 
-    CompositionLocalProvider(LocalClipboardManager provides richClipboardManager) {
+CompositionLocalProvider(LocalClipboardManager provides richClipboardManager) {
         BasicTextField(
             value = state.textFieldValue,
             onValueChange = {
                 if (readOnly) return@BasicTextField
                 if (it.text.length > maxLength) return@BasicTextField
-
                 state.onTextFieldValueChange(it)
             },
             modifier = modifier

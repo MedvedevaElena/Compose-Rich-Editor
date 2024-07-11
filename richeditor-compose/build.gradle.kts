@@ -17,23 +17,23 @@ kotlin {
             }
         }
     }
-    jvm("desktop") {
-        jvmToolchain(11)
-    }
-    js(IR) {
-        browser()
-    }
-    @OptIn(ExperimentalWasmDsl::class)
-    wasmJs {
-        browser {
-            testTask {
-                enabled = false
-            }
-        }
-    }
-    iosX64()
-    iosArm64()
-    iosSimulatorArm64()
+//    jvm("desktop") {
+//        jvmToolchain(11)
+//    }
+//    js(IR) {
+//        browser()
+//    }
+//    @OptIn(ExperimentalWasmDsl::class)
+//    wasmJs {
+//        browser {
+//            testTask {
+//                enabled = false
+//            }
+//        }
+//    }
+//    iosX64()
+//    iosArm64()
+//    iosSimulatorArm64()
 
     sourceSets {
         val commonMain by getting {
