@@ -992,13 +992,28 @@ class RichTextState internal constructor(
      *
      * @param newTextFieldValue the new text field value.
      */
+
+    private var superMegaTempTextValue: TextFieldValue? = null
+
+
     internal fun onTextFieldValueChange(newTextFieldValue: TextFieldValue) {
+        println("[MARK] START '${newTextFieldValue.text}'")
+
+        if (superMegaTempTextValue == newTextFieldValue) {
+            return
+        }
+        superMegaTempTextValue = newTextFieldValue
+
         tempTextFieldValue = newTextFieldValue
 
         if (tempTextFieldValue.text.length > textFieldValue.text.length)
             handleAddingCharacters()
-        else if (tempTextFieldValue.text.length < textFieldValue.text.length)
+        else if (tempTextFieldValue.text.length < textFieldValue.text.length) {
+            println("[MARK] tempTextFieldValue '${tempTextFieldValue.text}'")
+            println("[MARK] textFieldValue '${textFieldValue.text}'")
             handleRemovingCharacters()
+        }
+//            tempTextFieldValue = textFieldValue
         else if (
             tempTextFieldValue.text == textFieldValue.text &&
             tempTextFieldValue.selection != textFieldValue.selection
@@ -1006,12 +1021,16 @@ class RichTextState internal constructor(
             val lastPressPosition = this.lastPressPosition
             if (lastPressPosition != null) {
                 adjustSelection(lastPressPosition, newTextFieldValue.selection)
+
+                println("[MARK] FINISH '${textFieldValue.text}'")
                 return
             }
         }
 
         // Update text field value
         updateTextFieldValue()
+
+        println("[MARK] FINISH '${textFieldValue.text}'")
     }
 
     /**
@@ -1120,19 +1139,23 @@ class RichTextState internal constructor(
         styledRichSpanList.addAll(newStyledRichSpanList)
     }
 
+    // TODO: перевести на анлийский, а то я и по-русски не знаю, что тут сказать
+    // и имя поменять
+    /**
+     *
+     *
+     */
     private fun prepare() {
         var typedCharsCount = tempTextFieldValue.text.length - textFieldValue.text.length
 // нам иногда врёт selection, поэтому будем искать новое в строках сами
 
         var spacesAdded = false
         var addSpaces = ""
-        var deltaSelection = 0
         var startTypeIndex = tempTextFieldValue.selection.max - typedCharsCount
         while (startTypeIndex > 0) {
             val range = IntRange(0, startTypeIndex - 1)
             if (textFieldValue.text.substring(range) != tempTextFieldValue.text.substring(range)) {
                 startTypeIndex -= 1
-//                deltaSelection +=1
                 addSpaces += " "
                 typedCharsCount += 1
                 spacesAdded = true
@@ -1148,15 +1171,6 @@ class RichTextState internal constructor(
                     .toString()
             )
         }
-
-//        if (deltaSelection != 0 && deltaSelection >= tempTextFieldValue.selection.min) {
-//            tempTextFieldValue = tempTextFieldValue.copy(
-//                selection = TextRange(
-//                    tempTextFieldValue.selection.min - deltaSelection,
-//                    tempTextFieldValue.selection.max - deltaSelection,
-//                )
-//            )
-//        }
     }
 
     /**
