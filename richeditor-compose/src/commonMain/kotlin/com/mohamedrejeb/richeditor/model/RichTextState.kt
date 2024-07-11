@@ -1120,12 +1120,7 @@ class RichTextState internal constructor(
         styledRichSpanList.addAll(newStyledRichSpanList)
     }
 
-    /**
-     * Handles adding characters to the text field.
-     * This method will update the [richParagraphList] to reflect the new changes.
-     * This method will use the [tempTextFieldValue] to get the new characters.
-     */
-    private fun handleAddingCharacters() {
+    private fun prepare() {
         var typedCharsCount = tempTextFieldValue.text.length - textFieldValue.text.length
 // нам иногда врёт selection, поэтому будем искать новое в строках сами
 
@@ -1137,18 +1132,14 @@ class RichTextState internal constructor(
             val range = IntRange(0, startTypeIndex - 1)
             if (textFieldValue.text.substring(range) != tempTextFieldValue.text.substring(range)) {
                 startTypeIndex -= 1
-                deltaSelection +=1
-//                addSpaces += " "
-//                typedCharsCount += 1
-//                spacesAdded = true
+//                deltaSelection +=1
+                addSpaces += " "
+                typedCharsCount += 1
+                spacesAdded = true
             } else {
                 break
             }
         }
-        val typedText = tempTextFieldValue.text.substring(
-            startIndex = startTypeIndex,
-            endIndex = startTypeIndex + typedCharsCount,
-        ) + addSpaces
 
         if (spacesAdded) {
             tempTextFieldValue = tempTextFieldValue.copy(
@@ -1158,14 +1149,31 @@ class RichTextState internal constructor(
             )
         }
 
-        if (deltaSelection != 0 && deltaSelection >= tempTextFieldValue.selection.min) {
-            tempTextFieldValue = tempTextFieldValue.copy(
-                selection = TextRange(
-                    tempTextFieldValue.selection.min - deltaSelection,
-                    tempTextFieldValue.selection.max - deltaSelection,
-                )
-            )
-        }
+//        if (deltaSelection != 0 && deltaSelection >= tempTextFieldValue.selection.min) {
+//            tempTextFieldValue = tempTextFieldValue.copy(
+//                selection = TextRange(
+//                    tempTextFieldValue.selection.min - deltaSelection,
+//                    tempTextFieldValue.selection.max - deltaSelection,
+//                )
+//            )
+//        }
+    }
+
+    /**
+     * Handles adding characters to the text field.
+     * This method will update the [richParagraphList] to reflect the new changes.
+     * This method will use the [tempTextFieldValue] to get the new characters.
+     */
+    private fun handleAddingCharacters() {
+        prepare()
+        val typedCharsCount = tempTextFieldValue.text.length - textFieldValue.text.length
+
+        var startTypeIndex = tempTextFieldValue.selection.max - typedCharsCount
+
+        val typedText = tempTextFieldValue.text.substring(
+            startIndex = startTypeIndex,
+            endIndex = startTypeIndex + typedCharsCount,
+        )
 
         val previousIndex = startTypeIndex - 1
 
