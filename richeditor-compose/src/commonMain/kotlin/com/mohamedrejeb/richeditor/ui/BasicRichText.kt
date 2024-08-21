@@ -36,6 +36,7 @@ fun BasicRichText(
         mutableStateOf(PointerIcon.Default)
     }
 
+    println("[MARK] BasicRichText 1")
     BasicText(
         text = state.visualTransformation.filter(state.annotatedString).text,
         modifier = modifier

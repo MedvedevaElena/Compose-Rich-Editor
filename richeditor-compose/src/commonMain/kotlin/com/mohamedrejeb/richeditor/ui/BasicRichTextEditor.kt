@@ -5,13 +5,16 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.PressInteraction
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.calculateStartPadding
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusProperties
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -25,6 +28,7 @@ import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.LayoutDirection
 import com.mohamedrejeb.richeditor.model.RichTextState
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.collectLatest
 
 
 /**
@@ -193,6 +197,9 @@ fun BasicRichTextEditor(
         @Composable { innerTextField -> innerTextField() },
     contentPadding: PaddingValues
 ) {
+
+    println("[MARK] BasicRichTextEditor 2")
+
     val density = LocalDensity.current
     val localTextStyle = LocalTextStyle.current
     val layoutDirection = LocalLayoutDirection.current
@@ -208,11 +215,13 @@ fun BasicRichTextEditor(
         state.singleParagraphMode = singleParagraph
     }
 
+    val focusRequester = remember { FocusRequester() }
     if (!singleParagraph) {
         // Workaround for Android to fix a bug in BasicTextField where it doesn't select the correct text
         // when the text contains multiple paragraphs.
         LaunchedEffect(interactionSource) {
             interactionSource.interactions.collect { interaction ->
+                focusRequester.requestFocus()
                 if (interaction is PressInteraction.Press) {
                     val pressPosition = interaction.pressPosition
                     val topPadding = with(density) { contentPadding.calculateTopPadding().toPx() }
@@ -230,19 +239,21 @@ fun BasicRichTextEditor(
 }
 
 CompositionLocalProvider(LocalClipboardManager provides richClipboardManager) {
+    println("[MARK] BasicRichTextEditor 1")
         BasicTextField(
             value = state.textFieldValue,
             onValueChange = {
                 if (readOnly) return@BasicTextField
                 if (it.text.length > maxLength) return@BasicTextField
                 state.onTextFieldValueChange(it)
+                focusRequester.requestFocus()
             },
             modifier = modifier
                 .drawRichSpanStyle(
                     richTextState = state,
                     topPadding = with(density) { contentPadding.calculateTopPadding().toPx() },
                     startPadding = with(density) { contentPadding.calculateStartPadding(layoutDirection).toPx() },
-                )
+                ).focusRequester(focusRequester)
                 .then(
                     if (!readOnly) Modifier
                     else Modifier.focusProperties { canFocus = false }

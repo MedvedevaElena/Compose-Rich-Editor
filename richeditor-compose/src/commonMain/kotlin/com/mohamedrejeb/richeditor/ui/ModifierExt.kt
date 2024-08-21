@@ -14,8 +14,10 @@ internal fun Modifier.drawRichSpanStyle(
     topPadding: Float = 0f,
     startPadding: Float = 0f,
 ): Modifier {
+    println("[MARK] drawRichSpanStyle")
     return this
         .drawBehind {
+            println("[MARK] drawBehind 1")
             val styledRichSpanList = mutableListOf<Pair<RichSpanStyle, TextRange>>()
 
             richTextState.styledRichSpanList.fastForEach { richSpan ->
@@ -33,6 +35,8 @@ internal fun Modifier.drawRichSpanStyle(
                 else
                     styledRichSpanList.add(richSpan.richSpansStyle to TextRange(richSpan.textRange.start, end))
             }
+
+            println("[MARK] styledRichSpanList count ${styledRichSpanList.count()}")
 
             styledRichSpanList.fastForEach { (style, textRange) ->
                 richTextState.textLayoutResult?.let { textLayoutResult ->

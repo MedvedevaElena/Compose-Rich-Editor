@@ -1,5 +1,7 @@
 package com.mohamedrejeb.richeditor.parser.html
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.ui.text.SpanStyle
 import com.mohamedrejeb.ksoup.entities.KsoupEntities
 import com.mohamedrejeb.ksoup.html.parser.KsoupHtmlHandler
@@ -16,6 +18,7 @@ import com.mohamedrejeb.richeditor.parser.utils.*
 import com.mohamedrejeb.richeditor.utils.customMerge
 import com.mohamedrejeb.richeditor.utils.fastForEach
 import com.mohamedrejeb.richeditor.utils.fastForEachIndexed
+import java.util.Base64
 
 internal object RichTextStateHtmlParser : RichTextStateParser<String> {
 
@@ -356,6 +359,7 @@ internal object RichTextStateHtmlParser : RichTextStateParser<String> {
     /**
      * Encodes HTML elements to [RichSpanStyle].
      */
+    @RequiresApi(Build.VERSION_CODES.O)
     @OptIn(ExperimentalRichTextApi::class)
     private fun encodeHtmlElementToRichSpanStyle(
         tagName: String,
@@ -366,6 +370,23 @@ internal object RichTextStateHtmlParser : RichTextStateParser<String> {
                 RichSpanStyle.Link(url = attributes["href"].orEmpty())
             CodeSpanTagName, OldCodeSpanTagName ->
                 RichSpanStyle.Code()
+            "img" ->
+            {
+                if (!attributes.containsKey("src")) {
+                    RichSpanStyle.Default
+                }
+                val src = attributes["src"]
+                if (src == null || !src.contains(";base64,")) {
+                    RichSpanStyle.Default
+                }
+                val base64 = attributes["src"]?.substringAfter(";base64,")
+                val data = Base64.getDecoder().decode(base64)
+                if (data == null) {
+                    RichSpanStyle.Default
+                } else {
+                    RichSpanStyle.Image(data)
+                }
+            }
             else ->
                 RichSpanStyle.Default
         }
